@@ -3,7 +3,7 @@
 - Updated: 2026-03-19 14:46 KST
 - OpenCode Session ID: `ses_2fb61dd72ffen9ywR8t5JWY4Sx`
 - Project: `mynamr`
-- Current status: Go module bootstrap, CLI scaffold, GoReleaser config, and release helper scripts are in place
+- Current status: Go module bootstrap, DB-backed rule registry, executable rule specs, clipboard I/O, gdedit sync flow, GoReleaser config, and release helper scripts are in place
 
 ## Continuation context
 
@@ -20,6 +20,8 @@
 - Do not use AI runtime logic or external script-language dependencies
 - Base recognition only on the input string itself
 - Preserve the core pipeline: `input -> recognizer -> matcher -> selector -> renderer -> output`
+- Persist rule registry state via the config-managed SQLite path
+- Let `mynamr` own editor sync registration and spec save/load over stdio
 
 ## MVP target
 
@@ -29,14 +31,15 @@
 - builtin rules: `name_alias_bundle`, `catalog_code_title`
 - template rendering
 - `rule list` / `rule show`
-- SQLite-backed registry
+- SQLite-backed registry with config-managed DB path
+- gdedit sync registration and editor-driven `rule update <name>` flow
 
 ## Recommended next steps
 
-1. Implement real clipboard adapters for `--clip` and `--outclip`
-2. Build the recognizer, matcher, selector, and renderer flow
-3. Add builtin rule loading beyond static metadata and wire SQLite registry support
-4. Expand CLI coverage for `rule enable`, `rule disable`, and `rule add/remove`
+1. Expand the executable rule engine beyond the currently supported detect/source vocabulary
+2. Add richer rule validation so unsupported DSL tokens fail before save
+3. Decide whether builtin RuleSpec seeds stay in code or move to embedded spec assets
+4. Polish `--help` and docs around sync, clip, and spec editing workflows
 5. Cut the first tagged release with `scripts/release-tag.sh` or `scripts/release-tag.ps1`
 
 ## Resume note
