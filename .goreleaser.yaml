@@ -1,0 +1,50 @@
+version: 2
+
+project_name: mynamr
+
+before:
+  hooks:
+    - go test ./...
+
+builds:
+  - id: mynamr
+    main: ./cmd/mynamr
+    binary: mynamr
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/Ddam-j/mynamr/internal/version.Version={{.Version}} -X github.com/Ddam-j/mynamr/internal/version.Commit={{.Commit}} -X github.com/Ddam-j/mynamr/internal/version.Date={{.Date}}
+
+archives:
+  - id: mynamr-archive
+    ids:
+      - mynamr
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "(?i)merge"
