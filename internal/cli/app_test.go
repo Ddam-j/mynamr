@@ -92,7 +92,7 @@ func TestClipboardInputAutoDetectsAndWritesClipboard(t *testing.T) {
 	stderr := &bytes.Buffer{}
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 	clipboard := &fakeClipboard{
-		readText: "코요이 코난 최신작 & 프로필 (Koyoi Konan, 小宵こなん (こよいこなん))",
+		readText: "하늘 정원 아카이브 최신작 & 프로필 (Sky Garden Archive, 青空庭園)",
 	}
 
 	app := newAppWithClipboard(bytes.NewBuffer(nil), stdout, stderr, clipboard)
@@ -101,7 +101,7 @@ func TestClipboardInputAutoDetectsAndWritesClipboard(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
-	want := "코요이 코난.小宵こなん.Koyoi Konan\n"
+	want := "하늘 정원 아카이브.青空庭園.Sky Garden Archive\n"
 	if stdout.String() != want {
 		t.Fatalf("unexpected stdout: got %q want %q", stdout.String(), want)
 	}
@@ -114,7 +114,7 @@ func TestClipboardInputForcedRule(t *testing.T) {
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
-	clipboard := &fakeClipboard{readText: "ABP-123 Sample Title"}
+	clipboard := &fakeClipboard{readText: "SNOS-084 - Summer Window Letter"}
 
 	app := newAppWithClipboard(bytes.NewBuffer(nil), stdout, stderr, clipboard)
 	code := app.Run([]string{"-clip", "--rule", "catalog_code_title"})
@@ -122,7 +122,7 @@ func TestClipboardInputForcedRule(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
-	if stdout.String() != "[ABP-123] Sample Title\n" {
+	if stdout.String() != "[SNOS-084] Summer Window Letter\n" {
 		t.Fatalf("unexpected forced clipboard output: %q", stdout.String())
 	}
 }
@@ -173,13 +173,13 @@ func TestClipboardWriteErrorStillPrintsOutput(t *testing.T) {
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 	clipboard := &fakeClipboard{writeErr: errors.New("clipboard busy")}
 
-	app := newAppWithClipboard(bytes.NewBufferString("ABP-123 Sample Title\n"), stdout, stderr, clipboard)
+	app := newAppWithClipboard(bytes.NewBufferString("SNOS-084 - Summer Window Letter\n"), stdout, stderr, clipboard)
 	code := app.Run([]string{"-outclip"})
 
 	if code != 1 {
 		t.Fatalf("expected exit code 1, got %d", code)
 	}
-	if stdout.String() != "[ABP-123] Sample Title\n" {
+	if stdout.String() != "[SNOS-084] Summer Window Letter\n" {
 		t.Fatalf("unexpected stdout on clipboard write error: %q", stdout.String())
 	}
 	if !strings.Contains(stderr.String(), "clipboard busy") {
@@ -194,12 +194,12 @@ func TestOutclipWithArgvStillPrintsOutputOnWriteError(t *testing.T) {
 	clipboard := &fakeClipboard{writeErr: errors.New("clipboard busy")}
 
 	app := newAppWithClipboard(bytes.NewBuffer(nil), stdout, stderr, clipboard)
-	code := app.Run([]string{"-outclip", "ABP-123 Sample Title"})
+	code := app.Run([]string{"-outclip", "SNOS-084 - Summer Window Letter"})
 
 	if code != 1 {
 		t.Fatalf("expected exit code 1, got %d", code)
 	}
-	if stdout.String() != "[ABP-123] Sample Title\n" {
+	if stdout.String() != "[SNOS-084] Summer Window Letter\n" {
 		t.Fatalf("unexpected stdout on argv clipboard write error: %q", stdout.String())
 	}
 	if !strings.Contains(stderr.String(), "clipboard busy") {
@@ -281,8 +281,8 @@ func TestTopLevelHelp(t *testing.T) {
 		"mynamr launches gdedit --sync mynamr <name> automatically",
 		"PowerShell: .\\mynamr.exe completion powershell | Out-String | Invoke-Expression",
 		"PowerShell input with '&' or parentheses must be quoted as one argument",
-		".\\mynamr.exe \"코요이 코난 최신작 & 프로필 (Koyoi Konan, 小宵こなん (こよいこなん))\"",
-		"미야와키 사쿠라 최신곡 & 프로필 (Sakura Miyawaki, 宮脇咲良)",
+		".\\mynamr.exe \"하늘 정원 아카이브 최신작 & 프로필 (Sky Garden Archive, 青空庭園)\"",
+		"하늘 정원 아카이브 최신작 & 프로필 (Sky Garden Archive, 青空庭園)",
 	} {
 		if !strings.Contains(got, want) {
 			t.Fatalf("help output missing %q: %q", want, got)
@@ -826,13 +826,13 @@ func TestForcedRuleExecutesNameAliasBundle(t *testing.T) {
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 
 	app := NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code := app.Run([]string{"--rule", "name_alias_bundle", "코요이 코난 최신작 & 프로필 (Koyoi Konan, 小宵こなん (こよいこなん))"})
+	code := app.Run([]string{"--rule", "name_alias_bundle", "하늘 정원 아카이브 최신작 & 프로필 (Sky Garden Archive, 青空庭園)"})
 
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
 
-	if stdout.String() != "코요이 코난.小宵こなん.Koyoi Konan\n" {
+	if stdout.String() != "하늘 정원 아카이브.青空庭園.Sky Garden Archive\n" {
 		t.Fatalf("unexpected forced rule output: %q", stdout.String())
 	}
 }
@@ -843,13 +843,13 @@ func TestForcedRuleExecutesCatalogCodeTitle(t *testing.T) {
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 
 	app := NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code := app.Run([]string{"--rule", "catalog_code_title", "ABP-123 Sample Title"})
+	code := app.Run([]string{"--rule", "catalog_code_title", "SNOS-084 - Summer Window Letter"})
 
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
 
-	if stdout.String() != "[ABP-123] Sample Title\n" {
+	if stdout.String() != "[SNOS-084] Summer Window Letter\n" {
 		t.Fatalf("unexpected catalog rule output: %q", stdout.String())
 	}
 }
@@ -871,11 +871,11 @@ func TestCatalogCodeTitleDropWordsApplyToAfterCode(t *testing.T) {
 	stdout = &bytes.Buffer{}
 	stderr = &bytes.Buffer{}
 	app = NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code = app.Run([]string{"--rule", "catalog_code_title", "ABP-123 Latest Profile Title"})
+	code = app.Run([]string{"--rule", "catalog_code_title", "SNOS-084 Latest Profile Title"})
 	if code != 0 {
 		t.Fatalf("expected forced rule exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
-	if stdout.String() != "[ABP-123] Title\n" {
+	if stdout.String() != "[SNOS-084] Title\n" {
 		t.Fatalf("unexpected catalog drop-word output: %q", stdout.String())
 	}
 }
@@ -897,11 +897,11 @@ func TestCatalogCodeTitleLeadingSeparatorRemovedButInnerDashPreserved(t *testing
 	stdout = &bytes.Buffer{}
 	stderr = &bytes.Buffer{}
 	app = NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code = app.Run([]string{"--rule", "catalog_code_title", "SNOS-084 - \"A - B\" 소꿉친구"})
+	code = app.Run([]string{"--rule", "catalog_code_title", "SNOS-084 - \"A - B\" Harbor Story"})
 	if code != 0 {
 		t.Fatalf("expected forced rule exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
-	if stdout.String() != "[SNOS-084] \"A - B\" 소꿉친구\n" {
+	if stdout.String() != "[SNOS-084] \"A - B\" Harbor Story\n" {
 		t.Fatalf("unexpected preserved inner dash output: %q", stdout.String())
 	}
 }
@@ -912,13 +912,13 @@ func TestAutoDetectExecutesNameAliasBundle(t *testing.T) {
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 
 	app := NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code := app.Run([]string{"코요이 코난 최신작 & 프로필 (Koyoi Konan, 小宵こなん (こよいこなん))"})
+	code := app.Run([]string{"하늘 정원 아카이브 최신작 & 프로필 (Sky Garden Archive, 青空庭園)"})
 
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
 
-	if stdout.String() != "코요이 코난.小宵こなん.Koyoi Konan\n" {
+	if stdout.String() != "하늘 정원 아카이브.青空庭園.Sky Garden Archive\n" {
 		t.Fatalf("unexpected auto-detect alias output: %q", stdout.String())
 	}
 }
@@ -929,13 +929,13 @@ func TestAutoDetectExecutesCatalogCodeTitle(t *testing.T) {
 	t.Setenv("MYNAMR_CONFIG_DIR", t.TempDir())
 
 	app := NewApp(bytes.NewBuffer(nil), stdout, stderr)
-	code := app.Run([]string{"ABP-123 Sample Title"})
+	code := app.Run([]string{"SNOS-084 - Summer Window Letter"})
 
 	if code != 0 {
 		t.Fatalf("expected exit code 0, got %d, stderr=%q", code, stderr.String())
 	}
 
-	if stdout.String() != "[ABP-123] Sample Title\n" {
+	if stdout.String() != "[SNOS-084] Summer Window Letter\n" {
 		t.Fatalf("unexpected auto-detect catalog output: %q", stdout.String())
 	}
 }
